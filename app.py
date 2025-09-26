@@ -84,6 +84,7 @@ Return only the SQL code block. Do not add explanation.
 
 Constraints:
 - The table name is {table_name}.
+- Quote ALL identifiers (table & column names) with double quotes, e.g. "Αξία_πώλησης"
 - Use only the provided columns.
 - If the question is ambiguous, choose the most reasonable interpretation and proceed.
 - Prefer aggregations and GROUP BY when the user asks totals per dimension.
