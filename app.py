@@ -154,7 +154,7 @@ if uploaded is not None:
     st.subheader("Ask a question")
     question = st.text_input(
         "",
-        value=""
+        value="Your Text..."
     )
     run = st.button("Run")
 
