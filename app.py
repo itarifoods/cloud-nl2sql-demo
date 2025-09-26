@@ -22,7 +22,7 @@ OPENAI_MODEL    = os.getenv("OPENAI_MODEL", "gpt-4o-mini")  # change as needed
 FORBIDDEN_TOKENS = ["UPDATE","DELETE","INSERT","DROP","ALTER","CREATE","ATTACH","COPY","EXPORT","IMPORT","PRAGMA"]
 
 st.set_page_config(page_title="Cloud NL→SQL Agent", layout="wide")
-st.title("🧠 Cloud NL→SQL Agent (Excel or CSV → DuckDB)")
+st.title("SQL Agent for Excel or CSV")
 
 with st.sidebar:
     st.markdown("### Model Settings")
