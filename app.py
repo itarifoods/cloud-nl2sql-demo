@@ -21,21 +21,6 @@ OPENAI_MODEL    = os.getenv("OPENAI_MODEL", "gpt-4o-mini")  # change as needed
 # Security: Only SELECT allowed
 FORBIDDEN_TOKENS = ["UPDATE","DELETE","INSERT","DROP","ALTER","CREATE","ATTACH","COPY","EXPORT","IMPORT","PRAGMA"]
 
-import re
-
-def auto_quote_identifiers(sql: str, columns: list[str]) -> str:
-    """
-    Βάζει αυτόματα διπλά quotes γύρω από ονόματα στηλών που εμφανίζονται στη SQL
-    και δεν είναι ήδη σε quotes. Χρησιμοποιεί exact match με escape.
-    """
-    if not sql:
-        return sql
-    # Ταξινόμηση φθίνουσα σε μήκος για να μη γίνονται μερικά matches
-    for col in sorted(columns, key=len, reverse=True):
-        pattern = r'(?<!")' + re.escape(col) + r'(?!")'
-        sql = re.sub(pattern, f'"{col}"', sql)
-    return sql
-
 st.set_page_config(page_title="Cloud NL→SQL Agent", layout="wide")
 st.title("🧠 Cloud NL→SQL Agent (Excel or CSV → DuckDB)")
 
