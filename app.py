@@ -153,7 +153,7 @@ if uploaded is not None:
 
     st.subheader("Ask a question")
     question = st.text_input(
-        "Ρώτα κάτι για τα δεδομένα (π.χ. 'Top 10 πελάτες σε αξία' ή 'Πωλήσεις ανά μήνα 2024')",
+        "",
         value=""
     )
     run = st.button("Run")
