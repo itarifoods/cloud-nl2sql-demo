@@ -32,9 +32,6 @@ with st.sidebar:
         OPENAI_MODEL = model
     st.caption("Set OPENAI_API_KEY in environment/secrets. For Azure-compatible providers, also set OPENAI_API_BASE.")
 
-st.markdown("""
-Upload your dataset (Excel/CSV). The app builds an in-memory DuckDB table and answers natural-language questions by converting them to **safe SQL SELECT** via a hosted LLM.
-""")
 
 # =====================
 # File upload
