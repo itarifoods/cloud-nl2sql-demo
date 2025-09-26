@@ -43,26 +43,52 @@ uploaded = st.file_uploader("Upload .xlsx or .csv", type=["xlsx","csv"], accept_
 table_name = st.text_input("DuckDB table name", value="sales")
 
 def load_df(file):
-    if file.name.lower().endswith(".csv"):
+    import pandas as pd
+    import re
+
+    def sniff_excel_header_row(path_or_buffer):
+        # Διαβάζουμε πρώτα χωρίς header για να εντοπίσουμε τη γραμμή τίτλων
+        probe = pd.read_excel(path_or_buffer, header=None, nrows=5)
+        header_idx = None
+        for i in range(min(5, len(probe))):
+            row_vals = (probe.iloc[i].astype(str).str.strip()).tolist()
+            row_join = " | ".join(row_vals).lower()
+            if ("ημερ" in row_join and "παραστα" in row_join) or ("επωνυμ" in row_join):
+                header_idx = i
+                break
+        return header_idx if header_idx is not None else 0
+
+    if hasattr(file, "name") and file.name.lower().endswith(".csv"):
         df = pd.read_csv(file)
     else:
-        # Excel -> first sheet
-        df = pd.read_excel(file, sheet_name=None)
-        # pick first non-empty sheet
-        for name, d in df.items():
-            if len(d.columns) > 0:
-                df = d
-                break
-        if isinstance(df, dict):
-            # fallback empty
-            df = pd.DataFrame()
-    # normalize columns
-    import re
-df.columns = [
-    re.sub(r"[ \-\./]", "_", str(c)).strip("_")  # space, dash, dot, slash -> _
-    for c in df.columns
-]
+        # Excel -> εντόπισε σωστή γραμμή headers
+        header_row = sniff_excel_header_row(file)
+        df = pd.read_excel(file, header=header_row)
+
+    # 🔧 ΟΜΑΛΟΠΟΙΗΣΗ ΟΝΟΜΑΤΩΝ ΣΤΗΛΩΝ
+    # space/dash/dot/slash -> underscore, και αφαίρεση underscores στην αρχή/τέλος
+    df.columns = [
+        re.sub(r"[ \-\.\/]", "_", str(c)).strip("_")
+        for c in df.columns
+    ]
+
+    # Προαιρετικό: best-effort τύποι για ημερομηνίες/ποσά
+    for col in df.columns:
+        if any(x in col.lower() for x in ["ημερ", "date", "ώρα"]):
+            try:
+                df[col] = pd.to_datetime(df[col], errors="ignore")
+            except Exception:
+                pass
+        if any(x in col.lower() for x in ["αξία", "κόστος", "μ_κέρδος", "ποσ", "qty", "amount", "price"]):
+            df[col] = (
+                df[col].astype(str)
+                .str.replace(".", "", regex=False)   # χιλιάδες
+                .str.replace(",", ".", regex=False)  # δεκαδικά
+            )
+            df[col] = pd.to_numeric(df[col], errors="ignore")
+
     return df
+
 
 def build_schema_description(df: pd.DataFrame):
     cols = []
