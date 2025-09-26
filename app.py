@@ -57,7 +57,11 @@ def load_df(file):
             # fallback empty
             df = pd.DataFrame()
     # normalize columns
-    df.columns = [str(c).strip().replace(" ", "_").replace("-", "_") for c in df.columns]
+    import re
+df.columns = [
+    re.sub(r"[ \-\./]", "_", str(c)).strip("_")  # space, dash, dot, slash -> _
+    for c in df.columns
+]
     return df
 
 def build_schema_description(df: pd.DataFrame):
